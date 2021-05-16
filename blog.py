@@ -4,10 +4,9 @@ from functools import wraps
 from flask import Blueprint
 import requests
 from flask import current_app, request
-from flasks.extensions import db
+from flasks.extensions import db, tracer
 from flasks.model.todo import Todo
-from flasks.trace import tracer
-from flasks.trace.handler import inject
+from flasks.trace import inject
 
 bp = Blueprint("blog", __name__)
 
@@ -56,8 +55,12 @@ def index3():
 
 def tracer_test(url):
     headers = inject(tracer)
+    start_time = time.time()  # 记录程序开始运行时间
 
     requests.get(url, params={}, headers=headers)
+
+    end_time = time.time()  # 记录程序结束运行时间
+    print('Took %f second' % (end_time - start_time))
 
 
 @bp.route("/add")
